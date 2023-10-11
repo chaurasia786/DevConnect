@@ -12,15 +12,19 @@ namespace NetNestConnect.Repository
     {
         private DatabaseContext _dbContext;
         IConfiguration _configuration;
-        public UserCore(DatabaseContext databaseContext,IConfiguration configuration) { 
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserCore(DatabaseContext databaseContext,IConfiguration configuration, IHttpContextAccessor httpContextAccessor) { 
             _configuration = configuration; 
             _dbContext = databaseContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<DeleteResponse> DeleteUser(int id)
         {
             var deleteResponse = new DeleteResponse();
             var user =await _dbContext.Registrations.FindAsync(id);
+            
+            
             if (user == null)
             {
                 deleteResponse.IsDeleted = false;
@@ -28,7 +32,12 @@ namespace NetNestConnect.Repository
             }
             else
             {
-                 _dbContext.Registrations.Remove(user);
+                string userId = _httpContextAccessor.HttpContext.Session.GetString("UserId");
+                int curUserId= userId==null?0:Convert.ToInt32(userId);
+                user.DeletedBy = curUserId;
+                user.DeletedOn = DateTime.UtcNow;
+                user.IsDeleted = true;
+                _dbContext.Registrations.Update(user);
                 await _dbContext.SaveChangesAsync();
                 deleteResponse.IsDeleted = true;
                 deleteResponse.Message = "User Deleted Successfullyy";
@@ -61,19 +70,27 @@ namespace NetNestConnect.Repository
 
         public async Task<IEnumerable<UserRegistration>> GetAllUsers()
         {
-            var ele= await _dbContext.Registrations.ToListAsync();
+            var ele = await _dbContext.Registrations
+                          .Where(r => r.IsDeleted == null || r.IsDeleted == false).OrderByDescending(x=>x.Id)
+                          .ToListAsync();
+
             return ele;
         }
         public async Task<UserRegistration> GetUserById(int id)
         {
-           return await _dbContext.Registrations.FindAsync(id);
+           return await _dbContext.Registrations
+                .FindAsync(id);
 
         }
 
         public async Task<LoginResponse> Login(string Email, string password)
         {
+            try
+            {
+
+           
             var loginResponse = new LoginResponse();
-            var user = await _dbContext.Registrations.FirstOrDefaultAsync(x => x.Email == Email && x.Password == password);
+            var user = await _dbContext.Registrations.Where(r => r.IsDeleted == null || r.IsDeleted == false).FirstOrDefaultAsync(x => x.Email == Email && x.Password == password);
             if (user != null) {
                 loginResponse.IsSuccess = true;
                 loginResponse.UserId = user.Id.ToString();
@@ -84,7 +101,13 @@ namespace NetNestConnect.Repository
                 loginResponse.IsSuccess = false;
                 loginResponse.Message = "Login Failed";
             }
-            return loginResponse; ;
+            return loginResponse;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
 
         }
 
@@ -118,6 +141,8 @@ namespace NetNestConnect.Repository
                 user.Email = userRegistration.Email;
                 user.Password = userRegistration.Password;
                 user.PhoneNumber = userRegistration.PhoneNumber;
+                user.ModifiedBy = userRegistration.ModifiedBy;
+                user.ModifiedOn = userRegistration.ModifiedOn;
                  _dbContext.Registrations.Update(user);
                 await _dbContext.SaveChangesAsync(); 
                 updatedResponse.IsUpdated = true;

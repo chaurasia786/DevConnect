@@ -23,8 +23,19 @@ namespace NetNestConnect.Model
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Invalid mobile number format")]
         public string PhoneNumber { get; set; }
 
-        [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 100 characters.")]
+        [StringLength(100, MinimumLength =4 , ErrorMessage = "Password must be between 4 and 100 characters.")]
         public string Password { get; set; }
+
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedOn { get; set; } = DateTime.UtcNow;
+
+        public bool? IsDeleted { get; set; } = false;
+
+        public int? DeletedBy { get; set; }
+        public DateTime? DeletedOn { get; set; } 
+
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedOn { get; set; }
     }
 
 }

@@ -15,10 +15,14 @@ namespace NetNestConnect.Controllers
     {
         private IUser _userCore;
         private IEmailService _emailService;
+
+        
+
+
         public UserController(IUser userCore, IEmailService emailService)
         {
             _userCore = userCore;
-            _emailService = emailService;
+            _emailService = emailService; 
         }
         [HttpPost]
         [AllowAnonymous]
@@ -32,6 +36,8 @@ namespace NetNestConnect.Controllers
             if (login.IsSuccess)
             {
                 login.Token = _userCore.GenerateJWT(login.UserId, loginRequest.Email);
+                HttpContext.Session.SetString("UserId", login.UserId.ToString());
+                HttpContext.Session.SetString("Email", loginRequest.Email);
                 return Ok(login);
             }
             else
@@ -47,6 +53,10 @@ namespace NetNestConnect.Controllers
         [Route("RegisterUser")]
         public async Task<ActionResult<RegisterResponse>> UserRegister(UserRegistration userRegistration)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            userRegistration.CreatedBy = Convert.ToInt32(userId);
+            userRegistration.CreatedOn = DateTime.UtcNow;
+
             var response = await _userCore.RegisterUser(userRegistration);
             if (response.IsAdded)
             {
@@ -85,6 +95,7 @@ namespace NetNestConnect.Controllers
         [HttpDelete]
         public async Task<ActionResult<UserRegistration>> DeleteUser(int id)
         {
+            
             var deleteResponse=await _userCore.DeleteUser(id);
             if (deleteResponse.IsDeleted)
             {
@@ -99,6 +110,11 @@ namespace NetNestConnect.Controllers
         [Route("Update")]
         public async Task<ActionResult<UpdatedResponse>> UpdateUser(UserRegistration userRegistration)
         {
+            string userId = HttpContext.Session.GetString("UserId");
+            int curUserId = userId == null ? 0 : Convert.ToInt32(userId);
+            userRegistration.ModifiedBy = curUserId;
+            userRegistration.ModifiedOn = DateTime.UtcNow;
+            
             var updatedResponse = await _userCore.UpdateUser(userRegistration);
             if (updatedResponse.IsUpdated)
             {

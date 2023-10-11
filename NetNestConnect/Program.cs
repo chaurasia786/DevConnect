@@ -19,7 +19,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.ASCII.GetBytes(jwtSettings.GetValue<string>("Key"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,6 +41,10 @@ builder.Services.AddAuthentication(x =>
     };
 });
 builder.Services.AddAuthorization();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+
 builder.Services.AddSwaggerGen(c =>
 c.AddSecurityDefinition("token", new OpenApiSecurityScheme
 {
@@ -86,5 +90,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseSession();
 
 app.Run();
