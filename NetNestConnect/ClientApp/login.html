@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html>
+<html ng-app="loginApp">
+
+<head>
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Custom CSS for the login form -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #007bff;
+            background: linear-gradient(to right, #0062E6, #33AEFF);
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background-color: #fff;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px 0px black;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .login-logo img {
+                width: 70%;
+            }
+
+        .btn-custom {
+            background-color: #0062E6;
+            border: none;
+            border-radius: 4px;
+            color: #ffffff;
+        }
+        .captcha-box {
+            font-family: Arial, sans-serif;
+            width: 120px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #333;
+            letter-spacing: 5px;
+            font-weight: bold;
+            font-size: 24px;
+            background-color: #eee;
+            user-select: none; /* Prevents user from selecting the text */
+            position: relative;
+            overflow: hidden;
+        }
+
+            .captcha-box:after, .captcha-box:before {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 2px;
+                background-color: #333;
+                animation: noise 2s infinite linear;
+            }
+
+            .captcha-box:after {
+                top: 33%;
+            }
+
+            .captcha-box:before {
+                bottom: 33%;
+            }
+
+        @keyframes noise {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
+
+    <!-- Required Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script type="text/javascript" src="js/login.js"></script>
+    <!--<script src="https://www.google.com/recaptcha/api.js" async defer></script>-->
+</head>
+
+<body ng-controller="loginController">
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="images/user-login-icon-14.png" style="width:150px;height:100px" alt="Logo">
+        </div>
+        <div class="alert alert-danger" ng-if="errorMessage">
+            {{ errorMessage }}
+        </div>
+        <form ng-submit="submitLogin()" name="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter email" ng-model="email" required>
+                <div class="text-danger" ng-show="loginForm.email.$dirty && loginForm.email.$invalid">
+                    <span ng-show="loginForm.email.$error.required">Email is required.</span>
+                    <span ng-show="loginForm.email.$error.email">Invalid email format.</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="pwd">Password:</label>
+                <input type="password" class="form-control" id="pwd" placeholder="Enter password" ng-model="password" required>
+                <div class="text-danger" ng-show="loginForm.pwd.$dirty && loginForm.pwd.$invalid">
+                    <span ng-show="loginForm.pwd.$error.required">Password is required.</span>
+                </div>
+            </div>
+            <div class="form-group ">
+                <label style="font-weight:bold">Captcha</label> <span class="captcha-box" id="randomNumber"></span>
+                <div style="padding-top: 20px; padding-bottom: 20px; text-align:center">
+                    <input type="text" class="form-control" id="captcha" name="captcha" placeholder="Enter Captcha" ng-model="recaptchaResponse">
+                </div>
+            </div>
+            <button type="button" class="btn btn-custom btn-block" onclick="RefreshCaptcha()">Refresh</button>
+            <button type="submit" class="btn btn-custom btn-block" ng-disabled="loginForm.$invalid">Login</button>
+        </form>
+    </div>
+    <script>
+        var randomNumber = Math.floor(Math.random() * 9000) + 1000;
+        document.getElementById("randomNumber").textContent = randomNumber;
+
+        function RefreshCaptcha() {
+            var randomNumber = Math.floor(Math.random() * 9000) + 1000;
+            document.getElementById("randomNumber").textContent = randomNumber;
+        }
+    </script>
+</body>
+
+</html>

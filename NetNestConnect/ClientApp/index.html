@@ -1,0 +1,281 @@
+<html>
+<head>
+	<TITLE>AngularJS</TITLE>
+
+	<style>
+		.top-space {
+			margin-top: 50px; /* adjust this value according to your needs */
+		}
+
+		.content-space {
+			margin-top: 20px;
+		}
+        [ng-message] {
+            color: red;
+        }
+
+        .error-msg {
+            color: red;
+        }
+
+	</style>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-messages.js"></script>
+
+
+	<script type="text/javascript" src="js/app.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="myController">
+	<div class="container top-space">
+		<div class="text-right" style="padding-bottom:20px">
+			<button class="btn btn-primary" ng-click="logout()">Logout</button>
+		</div>
+		<div class="row align-items-center">
+			<div class="col-md-8">
+				<div class="text-left">
+					<h4>All Contacts</h4>
+				</div>
+
+			</div>
+			<div class="col-md-4 text-right">
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add"><i class="fas fa-plus"></i> Add Contact</button>
+			</div>
+		</div>
+		<div class="alert alert-info mt-3" ng-if="message=='Contact added successfully!'">
+			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+			Contact added Successfully!
+		</div>
+		<div class="row content-space">
+			<div class="col-12">
+				<table class="table table-hover table-bordered">
+					<thead class="thead-dark">
+						<tr>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Email</th>
+							<th>Phone Number</th>
+							<th class="text-center">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="user in users">
+							<td>{{user.firstName}}</td>
+							<td>{{user.lastName}}</td>
+							<td>{{user.email}}</td>
+							<td>{{user.phoneNumber}}</td>
+							<td class="text-center">
+								<button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#edit" ng-click="selectUser(user)"><i class="fas fa-edit"></i></button>
+								<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete" ng-click="selectUser(user)"><i class="fas fa-trash-alt"></i></button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal -->
+	<div class="modal fade" id="add" role="dialog">
+		<div class="modal-dialog modal-md">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<!-- Modal Header -->
+				<div class="modal-header" style="background-color: #337ab7; color: white; border-bottom: 4px solid #23527c;">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="color: white;">&times;</button>
+					<h4 class="modal-title">ADD CONTACT</h4>
+				</div>
+
+				<!-- Modal Body -->
+				<div class="modal-body">
+					<form class="form-horizontal" name="userForm" role="form" novalidate>
+						<!-- Hidden User ID -->
+						<input type="hidden" class="form-control" name="cid" id="cid" value="0" ng-model="newUser.id">
+
+						<!-- First Name -->
+						<div class="form-group">
+							<label class="control-label col-sm-3" for="fname_id">First Name:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" maxlength="50" name="firstName" id="fname_id" placeholder="Enter First Name" ng-model="newUser.firstName" required>
+								<div ng-messages="userForm.firstName.$error" ng-if="hasError(userForm.firstName)">
+									<div ng-message="required">First name is required</div>
+								</div>
+							</div>
+						</div>
+
+
+						<!-- Last Name -->
+						<div class="form-group">
+							<label class="control-label col-sm-3" for="lname_id">Last Name:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" maxlength="50" name="lastName" id="lname_id" placeholder="Enter Last Name" ng-model="newUser.lastName" required>
+								<div ng-messages="userForm.lastName.$error" ng-if="hasError(userForm.lastName)">
+									<div ng-message="required">Last name is required</div>
+								</div>
+							</div>
+						</div>
+
+
+						<!-- Email -->
+
+						<div class="form-group">
+							<label class="control-label col-sm-3" for="email">Email:</label>
+							<div class="col-sm-9">
+								<input type="email" class="form-control" maxlength="100" name="email" id="email" placeholder="Enter Email" ng-model="newUser.email" required>
+								<!-- For required validation -->
+								<div class="error-msg" ng-if="userForm.email.$error.required && (userForm.email.$touched || userForm.email.$dirty)">
+									Email is required
+								</div>
+								<!-- For email format validation -->
+								<div class="error-msg" ng-if="userForm.email.$error.email && (userForm.email.$touched || userForm.email.$dirty)">
+									Invalid email format
+								</div>
+							</div>
+						</div>
+
+
+						<!-- Phone Number -->
+						<div class="form-group">
+							<label class="control-label col-sm-3" for="phone">Phone Number:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" maxlength="100" name="phoneNumber" id="phone" placeholder="Enter Phone Number" ng-model="newUser.phoneNumber" required  ng-pattern="/^\d{10}$/">
+								<div ng-messages="userForm.phoneNumber.$error" ng-if="hasError(userForm.phoneNumber)">
+								<div class="error-msg" ng-if="userForm.phoneNumber.$error.required && (userForm.phoneNumber.$touched || userForm.phoneNumber.$dirty)">
+										Mobile number is required
+									</div>
+									<!-- For email format validation -->
+									<div class="error-msg" ng-if="userForm.phoneNumber.$error.pattern && (userForm.phoneNumber.$touched || userForm.phoneNumber.$dirty)">
+										Invalid mobile number format
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+
+						<!-- Password -->
+						<div class="form-group">
+							<label class="control-label col-sm-3" for="password">Password:</label>
+							<div class="col-sm-9">
+								<input type="password" class="form-control" name="password" id="password" placeholder="Enter Password" ng-model="newUser.password" required>
+								<div ng-messages="userForm.password.$error" ng-if="hasError(userForm.password)">
+									<div ng-message="required">Password is required</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Register Button -->
+						<div class="form-group">
+							<div class="col-sm-offset-3 col-sm-9">
+								<button type="submit" class="btn btn-primary btn-block" ng-disabled="userForm.$invalid" ng-click="saveUser(newUser, $event)">Register</button>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<!-- Modal Footer -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="edit" role="dialog">
+		<div class="modal-dialog modal-md">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header bg-primary text-white">
+					<!-- Added bg-primary and text-white for a colored header with white text -->
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">EDIT CONTACT</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="control-label col-sm-3" for="fname_id">First Name:</label>
+							<div class="col-sm-9">
+								<!-- Expanded to col-sm-9 for alignment -->
+								<input type="text" class="form-control" name="cfname" id="fname_id" placeholder="Enter First Name" ng-model="clickedUser.firstName">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-3" for="lname_id">Last Name:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" name="clname" id="lname_id" placeholder="Enter Last Name" ng-model="clickedUser.lastName">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-3" for="email_id">Email:</label>
+							<div class="col-sm-9">
+								<input type="email" class="form-control" name="cemail" id="email_id" placeholder="Enter Email" ng-model="clickedUser.email">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-offset-3 col-sm-9">
+								<!-- Align with input fields -->
+								<button type="submit" class="btn btn-info btn-block" ng-click="updateUser(clickedUser)" data-dismiss="modal">Update</button> <!-- btn-block makes the button full-width -->
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button> <!-- Used btn-outline-secondary for a modern outline button -->
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="delete" role="dialog">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">DELETE USER</h4>
+				</div>
+				<div class="modal-body">
+					<!-- Display user details -->
+					<p><strong>Name:</strong> {{ clickedUser.firstName }} {{ clickedUser.lastName }}</p>
+					<p><strong>Email:</strong> {{ clickedUser.email }}</p>
+					<p class="mt-3 mb-3">Do You Want To Delete This User Permanently?</p>
+					
+				</div>
+				<div class="modal-footer">
+					<div class="text-right">
+						<button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="deleteUser()">Yes</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+</body>
+</html>
