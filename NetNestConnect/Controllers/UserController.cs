@@ -27,14 +27,7 @@ namespace NetNestConnect.Controllers
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequestDto loginRequest)
         {
             var client = new HttpClient();
-            //var response = await client.GetStringAsync($"https://www.google.com/recaptcha/api/siteverify?secret=6Lf0oI8oAAAAAC2GuQc7tnSICf9OWjy5thSNdon-&response={loginRequest.recaptchaResponse}");
-
-            //var response = await client.GetStringAsync($"https://www.google.com/recaptcha/api/siteverify?secret='6LeQCiYTbbbDDD1xK2-U4cAaBCDoENFhTRDKyy79god'&response={loginRequest.recaptchaResponse}");
-            //if (!response.Contains("\"success\": true"))
-            //{
-            //    return BadRequest("reCAPTCHA verification failed");
-            //}
-
+       
             var login = await _userCore.Login(loginRequest.Email, loginRequest.Password);   
             if (login.IsSuccess)
             {

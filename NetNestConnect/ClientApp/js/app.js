@@ -35,23 +35,6 @@ myApp.controller('myController', function($scope, $http)
 		});
 	};
 
-	//
-	//$scope.saveUser = function (user) {
-	//	$http.post('https://localhost:7085/api/User/RegisterUser', user).then(function (response) {
-	//		// Assuming the response contains the saved user
-	//		if (response.data.IsAdded) {
-	//			/*$scope.users.push(user);*/
-	//			$scope.newUser = {};
-	//			$scope.message = "User added successfully!";
-	//		} else {
-	//			$scope.message = "Error: " + response.data.ErrorMessage;
-	//		}
-	//	}, function (error) {
-	//		$scope.message = "Error: " + error.data.errorMessage;
-	//	});
-	//};
-
-
 	$scope.saveUser = function (user, event) {
 		event.preventDefault();
 		$http.post('https://localhost:7085/api/User/RegisterUser', user).then(function (response) {
@@ -71,12 +54,6 @@ myApp.controller('myController', function($scope, $http)
 			alert($scope.message);
 		});
 	};
-
-	
-	
-
-
-	
 
 	$scope.selectUser = function (user) {
 		console.log(user);
